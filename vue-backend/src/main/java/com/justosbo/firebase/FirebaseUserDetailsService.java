@@ -16,8 +16,8 @@ public class FirebaseUserDetailsService implements AuthenticationUserDetailsServ
     public User loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         log.info("Getting user details based on firebase data {}", token);
         FirebaseData firebaseData = (FirebaseData) token.getPrincipal();
-        //can be replaced with custom logic / object, also handling any authorities
-        return new User(firebaseData.getName(), null, Collections.emptyList());
+        //could expand with fetching more details from database, authorities etc.
+        return new OsboUser(firebaseData.getName(),firebaseData.getEmail(), firebaseData.getProvider());
     }
 
 }

@@ -16,6 +16,11 @@ import java.io.InputStream;
 @RestController
 public class HelloController {
 
+    @GetMapping("/")
+    public String helloRoot() {
+        return "I'm alive!";
+    }
+
     @GetMapping("/api/public/hello")
     public String helloPublic(){
         return "Hello everyone!";

@@ -42,7 +42,7 @@ version '1.0-SNAPSHOT'
 dependencies {
     compileOnly('org.projectlombok:lombok')
 
-    compile group: 'com.google.firebase', name: 'firebase-admin', version: '5.9.0'
+    compile group: 'com.google.firebase', name: 'firebase-admin', version: '6.2.0'
 
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.boot:spring-boot-starter-web'

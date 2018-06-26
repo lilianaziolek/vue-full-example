@@ -27,7 +27,7 @@ public class FirebaseService {
             log.debug("Firebase token found and converted to {}", firebaseData);
             return firebaseData;
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Failed to authenticate token {} ", authToken);
+            log.error("Failed to authenticate token" + authToken, e);
             return null;
         }
     }
