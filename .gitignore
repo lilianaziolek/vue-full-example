@@ -1,13 +1,17 @@
 .idea
+
 # dependencies
 node_modules
+.gradle
 
-# logs
+#logs
 npm-debug.log
+yarn-error.log
 
-# Nuxt build
+#builds
 .nuxt
-
-# Nuxt generate
 dist
 build
+out
+
+

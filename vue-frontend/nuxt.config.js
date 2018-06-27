@@ -22,7 +22,8 @@ module.exports = {
     '@nuxtjs/axios'
   ],
   plugins: [
-    '~/plugins/vuetify'
+    '~/plugins/vuetify',
+    {src: '~/plugins/firebase', ssr: false}
   ],
   router: {
     middleware: ['sessionSetup']
@@ -47,6 +48,7 @@ module.exports = {
     '/logout': backendUrl
   },
   build: {
+    vendor: ['axios', 'firebase', 'firebaseui', 'vuetify'],
     extractCSS: true,
     cssSourceMap: false,
     /*

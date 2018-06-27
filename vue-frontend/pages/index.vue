@@ -1,9 +1,6 @@
 <template>
   <v-flex>
-    <v-card v-if="!loggedIn">
-      <div id="firebaseui-auth-container"></div>
-    </v-card>
-    <v-card v-else>
+    <v-card v-if="loggedIn">
       <v-card-title>
         You are logged in as {{user}}
       </v-card-title>
@@ -11,16 +8,19 @@
         <v-btn @click="logout">Logout</v-btn>
       </v-card-actions>
     </v-card>
+    <v-card v-else>
+      <div id="firebaseui-auth-container"></div>
+    </v-card>
+
     <v-card>
       <v-toolbar color="primary" dark>
-        <v-toolbar-title v-if="!loggedIn">Sign in should be above</v-toolbar-title>
+        <v-toolbar-title v-if="!loggedIn">Sign in buttons should appear above</v-toolbar-title>
         <v-toolbar-title v-else>You are logged in as {{user}}</v-toolbar-title>
         <v-spacer></v-spacer>
-
       </v-toolbar>
       <v-expansion-panel>
         <v-expansion-panel-content>
-          <div slot="header">Your welcome (expand panel to see)</div>
+          <div slot="header">Your welcome message (expand panel to see)</div>
           <v-card>
             <v-layout wrap>
               <v-flex xs12 class="elevation-1">
@@ -35,7 +35,6 @@
 </template>
 
 <script>
-  import {firebaseLogout, showFirebaseButtons} from '../plugins/firebase.js';
 
   export default {
     async fetch({store}) {
@@ -43,7 +42,7 @@
     },
     mounted() {
       if (!this.loggedIn) {
-        showFirebaseButtons(this.$store);
+        this.$firebaseUi.start('#firebaseui-auth-container', this.$firebaseUiConfig);
       }
     },
     components: {},
@@ -51,7 +50,6 @@
       loggedIn: function (oldValue, newValue) {
         this.$store.dispatch('home/fetchWelcomeMessage');
       }
-
     },
     computed: {
       welcomeMessage() {
@@ -66,8 +64,9 @@
     },
     methods: {
       async logout() {
-        await firebaseLogout(this.$store);
-        await showFirebaseButtons(this.$store);
+        await this.$firebase.auth().signOut();
+        await this.$store.dispatch("login/logout");
+        await this.$firebaseUi.start('#firebaseui-auth-container', this.$firebaseUiConfig);
       }
     }
   }
