@@ -4,15 +4,14 @@ import com.justosbo.firebase.FirebasePreAuthFilter;
 import com.justosbo.firebase.FirebaseService;
 import com.justosbo.firebase.FirebaseUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static java.util.Arrays.asList;
@@ -34,40 +33,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         FirebasePreAuthFilter firebasePreAuthFilter = new FirebasePreAuthFilter(this.firebaseService);
         firebasePreAuthFilter.setAuthenticationManager(authenticationManager());
 
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(asList("http://localhost:3000", "http://localhost:8080", "http://localhost:8081"));
+        corsConfiguration.setAllowedMethods(asList("*"));
+        corsConfiguration.setAllowedHeaders(asList("*"));
+        corsConfiguration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+
         // @formatter:off
 		http
             .addFilterAfter(firebasePreAuthFilter, AbstractPreAuthenticatedProcessingFilter.class)
             .authorizeRequests()
                 .antMatchers("/", "/favicon.ico","/robots.txt", "/api/public/**")
-                .permitAll()
+                    .permitAll()
                 .anyRequest()
-                .authenticated()
-                .and()
-                .logout() //note: logout has to be a post
-                .logoutSuccessUrl("/")
-                .and()
-                .cors()
-                .and().csrf().disable() //TODO some docs said Firebase tokens not vulnerable, but I think with Spring sessions it might be required
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .authenticated()
+            //note: logout has to be a post
+            .and().logout().logoutSuccessUrl("/")
+            .and().cors().configurationSource(corsConfigurationSource)
+            .and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         ;
         // @formatter:on
-    }
-
-    @Bean
-    CorsConfiguration corsConfiguration() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(asList("http://localhost:3000", "http://localhost:8080", "http://localhost:8081"));
-        configuration.setAllowedMethods(asList("*"));
-        configuration.setAllowedHeaders(asList("*"));
-        configuration.setAllowCredentials(true);
-        return configuration;
-    }
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource(CorsConfiguration corsConfiguration) {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
     }
 
     @Override
