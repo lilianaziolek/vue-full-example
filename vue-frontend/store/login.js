@@ -1,6 +1,6 @@
 export const state = () => ({
   loginDetails: {},
-  cookieCmd: null
+  cookieCmds: []
 });
 
 export const getters = {
@@ -8,8 +8,8 @@ export const getters = {
 };
 
 export const mutations = {
-  setCookieCmd(state, cookieCmd) {
-    state.cookieCmd = cookieCmd;
+  setCookieCmds(state, cookieCmds) {
+    state.cookieCmds = cookieCmds;
   },
   setLoginDetails(state, newLoginDetails) {
     state.loginDetails = newLoginDetails;
@@ -21,11 +21,13 @@ export const actions = {
     try {
       const successResult = await this.$axios.get('/api/public/loginStatus');
       commit('setLoginDetails', successResult.data);
-      let setCookieCmd = successResult.headers['set-cookie'];
-      if (setCookieCmd) {
-        commit('setCookieCmd', setCookieCmd);
-        let sessionCookie = setCookieCmd[0].split(';')[0].split('=');
-        this.$axios.defaults.headers.common['Cookie'] = sessionCookie[0] + "=" + sessionCookie[1];
+      let setCookieCmds = successResult.headers['set-cookie'];
+      if (setCookieCmds) {
+        commit('setCookieCmds', setCookieCmds);
+        for (let setCookieCmd of setCookieCmds) {
+          let sessionCookie = setCookieCmd.split(';')[0].split('=');
+          this.$axios.defaults.headers.common['Cookie'] = sessionCookie[0] + "=" + sessionCookie[1];
+        }
       }
     } catch (error) {
       console.error("User loginStatus check failed " + error);

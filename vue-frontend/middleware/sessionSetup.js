@@ -1,9 +1,10 @@
 export default async function ({store, req, res}) {
   await store.dispatch("login/checkLoginStatus");
-  let cookieCmd = store.state.login.cookieCmd;
-  if (process.server && cookieCmd) {
-    // console.log("On the server - passing on Set-Cookie header " + cookieCmd + " to client");
+  let cookieCmds = store.state.login.cookieCmds;
+  if (process.server && cookieCmds.length > 0) {
     //this is so that in mixed SSR/client mode both sides are logged in and share the session
-    res.setHeader('Set-Cookie', cookieCmd);
+    for (let cookieCmd of cookieCmds) {
+      res.setHeader('Set-Cookie', cookieCmd);
+    }
   }
 }
